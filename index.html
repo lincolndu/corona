@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Corona Live From Bangladesh and World</title>
+  <link rel="stylesheet" href="//www.thedailycampus.com/assets/plugins/bootstrap/css/bootstrap.min.css">
+  <style>
+    .container-fluid{margin: 0 auto;padding:0;}
+    .col-md-12 a{text-decoration: none;}
+    h4{margin: 0;padding-bottom:3px;}
+    body{overflow-y:hidden;}
+    .local th{padding:2px 10px !important;font-size: 12px;}
+    .world,.localArea{color: #ce1111;margin: 0;padding:2px !important;font-size: 12px}
+  </style>
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12 text-center">
+        <a href="#"><h4> বিশ্বজুড়ে করোনা ভাইরাস লাইভ </h4></a>
+        <select class="form-control" id="selectCountry"> <option value="">Select Country</option> </select>
+        <table class="table table-bordered">
+          <thead>
+            <tr class="local info">
+              <th class="text-center">আক্রান্ত</th>
+              <th class="text-center">কোয়া:</th>
+              <th class="text-center">সুস্থ</th>
+              <th class="text-center">মৃত্যু</th>
+              <th class="text-center">আ: মৃত্যু</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th class="text-center localArea warning" colspan="5"> <span class="localCountry">Bangladesh</span>  Report</th>
+            </tr>
+            <tr class="localreport" title="Bangladesh Report">
+              <th class="active bd_case text-center"></th>
+              <td class="active bd_tests text-center"></td>
+              <td class="success bd_recovered text-center"></td>
+              <td class="danger bd_death text-center"></td>
+              <td class="active bd_death_today text-center" style="color: red;"></td>
+            </tr>
+            <tr>
+              <th class="text-center world warning" colspan="5"> World Affected <span class="country_num"></span> Countries Report</th>
+            </tr>
+            <tr class="world_data" title="World Report">
+              <th class="active world_case text-center"></th>
+              <td class="active world_tests text-center"></td>
+              <td class="success world_recovered text-center"></td>
+              <td class="danger world_death text-center"></td>
+              <td class="active world_death_today text-center" style="color: red;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+ <script src="//www.thedailycampus.com/assets/plugins/jquery.min.js" type="text/javascript"></script>
+  <script type="text/javascript">
+
+    function fnum(x) {
+      if(isNaN(x)) return x;
+      if(x < 9999) {return x;}
+      // if(x < 1000000) {return x}
+      if(x < 1000000) {return Math.round(x/1000) + "K";}
+      if( x < 10000000) {return (x/1000000).toFixed(2) + "M";}
+      if(x < 1000000000) {return Math.round((x/1000000)) + "M";}
+      if(x < 1000000000000) {return Math.round((x/1000000000)) + "B";}
+      return "1 T+";
+    }
+
+    var visitor_country= localStorage.getItem("tdc_country");
+    if (!visitor_country) {
+      localStorage.setItem("tdc_country", "Bangladesh");
+    }
+    
+
+    function translteNum(num_str){
+            var bengali = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
+            var changed_nun='';
+            num_str.split('').forEach(letter => {
+              if(isNaN(letter)){changed_nun +=letter;}else{changed_nun += bengali[letter];}
+            });
+            return changed_nun;
+    }
+
+    $(document).ready(function(){
+      var all_data=[];
+      var bd_id=null;
+      $.get( "https://corona.lmao.ninja/countries", function( data ) {
+          var countries=[];       
+          $.each(data, function( k, v ) {
+            countries[k]=[k,v.country];
+            all_data[k]=v;
+          });
+
+          // countries.sort(function(a, b){  
+          //   return countries.indexOf(a) - countries.indexOf(b);
+          // });
+          
+          countries.sort(function(a, b){
+              var a1= a[1], b1= b[1];
+              if(a1== b1) return 0;
+              return a1> b1? 1: -1;
+          });
+          $.each(countries, function(k, v ) {
+            if (v[1]==visitor_country) {bd_id=v[0];}
+              $("#selectCountry").append("<option value="+v[0]+">"+v[1]+" </option>");
+          });
+
+
+          if (bd_id !==null) {
+            var bangladesh= all_data[bd_id];
+            $(".localreport").attr('title', visitor_country); 
+            $(".localCountry").attr('title', visitor_country); 
+            $(".localCountry").html(visitor_country); 
+            $(".bd_case").html(translteNum(bangladesh.cases.toLocaleString()));         
+            $(".bd_tests").html(translteNum(bangladesh.tests.toLocaleString()));         
+            $(".bd_recovered").html(translteNum(bangladesh.recovered.toLocaleString()));         
+            $(".bd_death").html(translteNum(bangladesh.deaths.toLocaleString()));         
+            $(".bd_death_today").html(translteNum(bangladesh.todayDeaths.toLocaleString()));
+          }
+      });      
+      $.get( "https://corona.lmao.ninja/all", function( data ) {
+          $(".world_case").html(fnum(data.cases));         
+          $(".world_tests").html(fnum(data.tests));         
+          $(".world_recovered").html(fnum(data.recovered));         
+          $(".world_death").html(translteNum(data.deaths.toLocaleString()));         
+          $(".world_death_today").html(translteNum(data.todayDeaths.toLocaleString()));          
+          $(".country_num").html(data.affectedCountries); 
+      });
+    $('#selectCountry').on('change', function() { 
+        var bd_data=all_data[parseInt(this.value)];   
+        $(".localreport").attr('title', bd_data.country); 
+        $(".localCountry").attr('title', bd_data.country); 
+        $(".localCountry").html(bd_data.country); 
+        $(".bd_case").html(translteNum(bd_data.cases.toLocaleString()));         
+        $(".bd_tests").html(translteNum(bd_data.tests.toLocaleString()));         
+        $(".bd_recovered").html(translteNum(bd_data.recovered.toLocaleString()));         
+        $(".bd_death").html(translteNum(bd_data.deaths.toLocaleString()));         
+        $(".bd_death_today").html(translteNum(bd_data.todayDeaths.toLocaleString()));
+        localStorage.setItem("tdc_country", bd_data.country); 
+      });
+    });
+  </script>
+</body>
+</html>
