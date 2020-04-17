@@ -179,7 +179,7 @@
     $(document).ready(function(){
       var all_data=[];
       var bd_id=null;
-      $.get( "https://corona.lmao.ninja/countries", function( data ) {
+      $.get( "https://corona.lmao.ninja/v2/countries", function( data ) {
           $.each(data, function( k, v ) {
             all_data[k]=[k,v.countryInfo.flag,v.country,v.recovered,v.cases,v.deaths,v.todayCases,v.todayDeaths,v.tests];
           });
@@ -271,7 +271,7 @@
           });        
 
       });      
-      $.get( "https://corona.lmao.ninja/all", function( data ) {
+      $.get( "https://corona.lmao.ninja/v2/all", function( data ) {
           $(".world_affected_country").html(translteNum(data.affectedCountries));         
           $(".world_recovered").html(translteNum(data.recovered));         
           $(".world_case").html(translteNum(data.cases));   
