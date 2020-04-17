@@ -88,7 +88,7 @@
     $(document).ready(function(){
       var all_data=[];
       var bd_id=null;
-      $.get( "https://corona.lmao.ninja/countries", function( data ) {
+      $.get( "https://corona.lmao.ninja/v2/countries", function( data ) {
           var countries=[];       
           $.each(data, function( k, v ) {
             countries[k]=[k,v.country];
@@ -122,7 +122,7 @@
             $(".bd_death_today").html(translteNum(bangladesh.todayDeaths.toLocaleString()));
           }
       });      
-      $.get( "https://corona.lmao.ninja/all", function( data ) {
+      $.get( "https://corona.lmao.ninja/v2/all", function( data ) {
           $(".world_case").html(fnum(data.cases));         
           $(".world_tests").html(fnum(data.tests));         
           $(".world_recovered").html(fnum(data.recovered));         
